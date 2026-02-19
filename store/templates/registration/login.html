@@ -1,0 +1,22 @@
+{% extends "store/base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6 mt-8">
+    <h1 class="text-xl font-semibold mb-4 text-center">Salesman Login</h1>
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p class="text-red-700 text-sm">Invalid username or password.</p>
+        {% endif %}
+        <div>
+            <label class="block text-sm mb-1">Username</label>
+            <input type="text" name="username" class="w-full border rounded px-3 py-2" required>
+        </div>
+        <div>
+            <label class="block text-sm mb-1">Password</label>
+            <input type="password" name="password" class="w-full border rounded px-3 py-2" required>
+        </div>
+        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white rounded px-4 py-2">Login</button>
+    </form>
+</div>
+{% endblock %}

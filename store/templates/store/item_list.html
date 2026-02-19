@@ -1,0 +1,117 @@
+{% extends "store/base.html" %}
+{% block title %}Items{% endblock %}
+{% block content %}
+<div class="flex flex-col gap-4">
+    <div class="bg-white p-4 rounded-lg shadow">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <h1 class="text-xl font-semibold text-slate-900">Item Price Details</h1>
+            <div class="flex gap-2">
+                <a href="{% url 'category-add' %}" class="inline-block bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded">Add Category</a>
+                <a href="{% url 'subcategory-add' %}" class="inline-block bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded">Add Sub Category</a>
+                <a href="{% url 'item-add' %}" class="inline-block bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded">Add Item</a>
+            </div>
+        </div>
+        <form method="get" class="grid md:grid-cols-4 gap-3 mt-4">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search item, model, sku, category..." class="border rounded px-3 py-2">
+            <select name="category" class="border rounded px-3 py-2">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="subcategory" class="border rounded px-3 py-2">
+                <option value="">All Sub Categories</option>
+                {% for subcategory in subcategories %}
+                    <option value="{{ subcategory.id }}" {% if selected_subcategory == subcategory.id|stringformat:"s" %}selected{% endif %}>{{ subcategory.name }}</option>
+                {% endfor %}
+            </select>
+            <button class="bg-slate-800 hover:bg-slate-700 text-white rounded px-3 py-2" type="submit">Search</button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-slate-200 text-left">
+                <tr>
+                    <th class="px-3 py-2">Item</th>
+                    <th class="px-3 py-2">Category</th>
+                    <th class="px-3 py-2">Sub Category</th>
+                    <th class="px-3 py-2">SKU</th>
+                    <th class="px-3 py-2">Price</th>
+                    <th class="px-3 py-2">Stock</th>
+                    <th class="px-3 py-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr class="border-t">
+                    <td class="px-3 py-2">
+                        <div class="font-medium">{{ item.name }}</div>
+                        <div class="text-slate-600 text-xs">Model: {{ item.model_name|default:"-" }}</div>
+                        <div class="text-slate-500 text-xs">{{ item.description|default:"-" }}</div>
+                    </td>
+                    <td class="px-3 py-2">{{ item.category.name }}</td>
+                    <td class="px-3 py-2">{{ item.subcategory.name }}</td>
+                    <td class="px-3 py-2">{{ item.sku|default:"-" }}</td>
+                    <td class="px-3 py-2 font-semibold">Rs. {{ item.price }}</td>
+                    <td class="px-3 py-2">{{ item.stock_quantity }}</td>
+                    <td class="px-3 py-2">
+                        <a class="text-blue-700" href="{% url 'item-edit' item.pk %}">Edit</a>
+                        <span class="text-slate-300 px-1">|</span>
+                        <a class="text-red-700" href="{% url 'item-delete' item.pk %}">Delete</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="px-3 py-6 text-center text-slate-500">No items found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const categorySelect = document.querySelector('select[name="category"]');
+        const subcategorySelect = document.querySelector('select[name="subcategory"]');
+        if (!categorySelect || !subcategorySelect) return;
+
+        const endpoint = "{% url 'subcategory-by-category' %}";
+        const selectedSubcategory = "{{ selected_subcategory|escapejs }}";
+
+        function setOptions(subcategories, selectedValue) {
+            subcategorySelect.innerHTML = "";
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent = "All Sub Categories";
+            subcategorySelect.appendChild(defaultOption);
+
+            subcategories.forEach((subcategory) => {
+                const option = document.createElement("option");
+                option.value = String(subcategory.id);
+                option.textContent = subcategory.name;
+                if (selectedValue && String(selectedValue) === String(subcategory.id)) {
+                    option.selected = true;
+                }
+                subcategorySelect.appendChild(option);
+            });
+        }
+
+        async function refreshSubcategories(keepSelection) {
+            const categoryId = categorySelect.value;
+            const selectedValue = keepSelection ? (subcategorySelect.value || selectedSubcategory) : "";
+            if (!categoryId) {
+                setOptions([], "");
+                return;
+            }
+            const response = await fetch(`${endpoint}?category_id=${encodeURIComponent(categoryId)}`);
+            const data = await response.json();
+            setOptions(data.subcategories || [], selectedValue);
+        }
+
+        categorySelect.addEventListener("change", () => refreshSubcategories(false));
+        refreshSubcategories(true);
+    })();
+</script>
+{% endblock %}

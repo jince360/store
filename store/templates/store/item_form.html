@@ -1,0 +1,90 @@
+{% extends "store/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-5 max-w-3xl">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+        <h1 class="text-xl font-semibold">{{ title }}</h1>
+        <div class="flex gap-2">
+            <a href="{% url 'category-add' %}?next=item-add" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-3 py-2 rounded">New Category</a>
+            <a href="{% url 'subcategory-add' %}?next=item-add" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-3 py-2 rounded">New Sub Category</a>
+        </div>
+    </div>
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="bg-red-50 text-red-700 p-3 rounded">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <div class="grid md:grid-cols-2 gap-4">
+            {% for field in form %}
+                <div class="{% if field.name == 'description' %}md:col-span-2{% endif %}">
+                    <label class="block text-sm mb-1">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <p class="text-red-700 text-sm">{{ field.errors|striptags }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded">Save</button>
+            <a href="{% url 'item-list' %}" class="bg-slate-300 hover:bg-slate-200 px-4 py-2 rounded">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    input, select, textarea {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+    }
+</style>
+
+<script>
+    (function () {
+        const categorySelect = document.getElementById("id_category");
+        const subcategorySelect = document.getElementById("id_subcategory");
+        if (!categorySelect || !subcategorySelect) return;
+
+        const endpoint = "{% url 'subcategory-by-category' %}";
+
+        function populateSubcategories(subcategories, selectedValue) {
+            subcategorySelect.innerHTML = "";
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent = "---------";
+            subcategorySelect.appendChild(defaultOption);
+
+            subcategories.forEach((subcategory) => {
+                const option = document.createElement("option");
+                option.value = String(subcategory.id);
+                option.textContent = subcategory.name;
+                if (selectedValue && String(selectedValue) === String(subcategory.id)) {
+                    option.selected = true;
+                }
+                subcategorySelect.appendChild(option);
+            });
+        }
+
+        async function refreshSubcategories(keepSelection) {
+            const categoryId = categorySelect.value;
+            const selectedValue = keepSelection ? subcategorySelect.value : "";
+            if (!categoryId) {
+                populateSubcategories([], "");
+                return;
+            }
+
+            const response = await fetch(`${endpoint}?category_id=${encodeURIComponent(categoryId)}`);
+            const data = await response.json();
+            populateSubcategories(data.subcategories || [], selectedValue);
+        }
+
+        categorySelect.addEventListener("change", function () {
+            refreshSubcategories(false);
+        });
+
+        refreshSubcategories(true);
+    })();
+</script>
+{% endblock %}

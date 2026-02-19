@@ -1,0 +1,33 @@
+{% extends "store/base.html" %}
+{% block title %}Add Sub Category{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-5 max-w-xl">
+    <h1 class="text-xl font-semibold mb-4">Add Sub Category</h1>
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next_url }}">
+        {% for field in form %}
+            <div>
+                <label class="block text-sm mb-1">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <p class="text-red-700 text-sm">{{ field.errors|striptags }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <div class="flex gap-2">
+            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded">Save Sub Category</button>
+            <a href="{% url next_url %}" class="bg-slate-300 hover:bg-slate-200 px-4 py-2 rounded">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    input, select, textarea {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "store/base.html" %}
+{% block title %}Delete Item{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-5 max-w-xl">
+    <h1 class="text-xl font-semibold mb-3">Delete Item</h1>
+    <p class="text-slate-700 mb-4">Are you sure you want to delete <strong>{{ item.name }}</strong>?</p>
+    <form method="post" class="flex gap-2">
+        {% csrf_token %}
+        <button type="submit" class="bg-red-700 hover:bg-red-600 text-white px-4 py-2 rounded">Delete</button>
+        <a href="{% url 'item-list' %}" class="bg-slate-300 hover:bg-slate-200 px-4 py-2 rounded">Cancel</a>
+    </form>
+</div>
+{% endblock %}

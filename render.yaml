@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: store-price-desk
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn store_project.wsgi --log-file -"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: store-price-desk-db
+          property: connectionString
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: "https://store-price-desk.onrender.com"
+
+databases:
+  - name: store-price-desk-db
