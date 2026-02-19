@@ -1,74 +1,90 @@
 {% extends "store/base.html" %}
 {% block title %}Items{% endblock %}
 {% block content %}
-<div class="flex flex-col gap-4">
-    <div class="bg-white p-4 rounded-lg shadow">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <h1 class="text-xl font-semibold text-slate-900">Item Price Details</h1>
-            <div class="flex gap-2">
-                <a href="{% url 'category-add' %}" class="inline-block bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded">Add Category</a>
-                <a href="{% url 'subcategory-add' %}" class="inline-block bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded">Add Sub Category</a>
-                <a href="{% url 'item-add' %}" class="inline-block bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded">Add Item</a>
+<div class="min-h-screen  p-1">
+    <div class="flex flex-col gap-6">
+        <div class="rounded-2xl border border-white/70 bg-white/80 backdrop-blur shadow-xl shadow-slate-200/60 p-5 md:p-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <p class="text-xs font-semibold tracking-[0.2em] uppercase text-slate-500">Inventory Dashboard</p>
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Item Price Details</h1>
+                    <p class="text-sm text-slate-600 mt-1">Manage categories, pricing, and stock in one place.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{% url 'category-add' %}" class="inline-flex items-center justify-center bg-white border border-slate-300 hover:border-slate-400 text-slate-800 px-4 py-2 rounded-lg text-sm font-medium transition">Add Category</a>
+                    <a href="{% url 'subcategory-add' %}" class="inline-flex items-center justify-center bg-white border border-slate-300 hover:border-slate-400 text-slate-800 px-4 py-2 rounded-lg text-sm font-medium transition">Add Sub Category</a>
+                    <a href="{% url 'item-add' %}" class="inline-flex items-center justify-center bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg shadow-emerald-200 transition">Add Item</a>
+                </div>
             </div>
-        </div>
-        <form method="get" class="grid md:grid-cols-4 gap-3 mt-4">
-            <input type="text" name="q" value="{{ query }}" placeholder="Search item, model, sku, category..." class="border rounded px-3 py-2">
-            <select name="category" class="border rounded px-3 py-2">
-                <option value="">All Categories</option>
-                {% for category in categories %}
-                    <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
-                {% endfor %}
-            </select>
-            <select name="subcategory" class="border rounded px-3 py-2">
-                <option value="">All Sub Categories</option>
-                {% for subcategory in subcategories %}
-                    <option value="{{ subcategory.id }}" {% if selected_subcategory == subcategory.id|stringformat:"s" %}selected{% endif %}>{{ subcategory.name }}</option>
-                {% endfor %}
-            </select>
-            <button class="bg-slate-800 hover:bg-slate-700 text-white rounded px-3 py-2" type="submit">Search</button>
-        </form>
-    </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto">
-        <table class="w-full min-w-[760px] text-sm">
-            <thead class="bg-slate-200 text-left">
-                <tr>
-                    <th class="px-3 py-2">Item</th>
-                    <th class="px-3 py-2">Category</th>
-                    <th class="px-3 py-2">Sub Category</th>
-                    <th class="px-3 py-2">SKU</th>
-                    <th class="px-3 py-2">Price</th>
-                    <th class="px-3 py-2">Stock</th>
-                    <th class="px-3 py-2">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for item in items %}
-                <tr class="border-t">
-                    <td class="px-3 py-2">
-                        <div class="font-medium">{{ item.name }}</div>
-                        <div class="text-slate-600 text-xs">Model: {{ item.model_name|default:"-" }}</div>
-                        <div class="text-slate-500 text-xs">{{ item.description|default:"-" }}</div>
-                    </td>
-                    <td class="px-3 py-2">{{ item.category.name }}</td>
-                    <td class="px-3 py-2">{{ item.subcategory.name }}</td>
-                    <td class="px-3 py-2">{{ item.sku|default:"-" }}</td>
-                    <td class="px-3 py-2 font-semibold">Rs. {{ item.price }}</td>
-                    <td class="px-3 py-2">{{ item.stock_quantity }}</td>
-                    <td class="px-3 py-2">
-                        <a class="text-blue-700" href="{% url 'item-edit' item.pk %}">Edit</a>
-                        <span class="text-slate-300 px-1">|</span>
-                        <a class="text-red-700" href="{% url 'item-delete' item.pk %}">Delete</a>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="7" class="px-3 py-6 text-center text-slate-500">No items found.</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+            <form method="get" class="grid md:grid-cols-4 gap-3 mt-5">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search item, model, sku, category..." class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400/70 focus:border-cyan-400">
+                <select name="category" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400/70 focus:border-cyan-400">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="subcategory" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400/70 focus:border-cyan-400">
+                    <option value="">All Sub Categories</option>
+                    {% for subcategory in subcategories %}
+                        <option value="{{ subcategory.id }}" {% if selected_subcategory == subcategory.id|stringformat:"s" %}selected{% endif %}>{{ subcategory.name }}</option>
+                    {% endfor %}
+                </select>
+                <button class="rounded-lg bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 text-sm font-semibold transition" type="submit">Search</button>
+            </form>
+        </div>
+
+        <div class="rounded-2xl border border-white/70 bg-white/85 backdrop-blur shadow-xl shadow-slate-200/60 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[760px] text-sm text-slate-700">
+                    <thead class="bg-gradient-to-r from-slate-900 to-slate-700 text-slate-100 text-xs uppercase tracking-wide">
+                        <tr>
+                            <th class="px-4 py-3 text-left">Item</th>
+                            <th class="px-4 py-3 text-left">Category</th>
+                            <th class="px-4 py-3 text-left">Sub Category</th>
+                            <th class="px-4 py-3 text-left">SKU</th>
+                            <th class="px-4 py-3 text-left">Price</th>
+                            <th class="px-4 py-3 text-left">Stock</th>
+                            <th class="px-4 py-3 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200/80">
+                    {% for item in items %}
+                        <tr class="hover:bg-cyan-50/60 transition-colors">
+                            <td class="px-4 py-3">
+                                <div class="font-semibold text-slate-900">{{ item.name }}</div>
+                                <div class="text-slate-600 text-xs">Model: {{ item.model_name|default:"-" }}</div>
+                                <div class="text-slate-500 text-xs">{{ item.description|default:"-" }}</div>
+                            </td>
+                            <td class="px-4 py-3">{{ item.category.name }}</td>
+                            <td class="px-4 py-3">{{ item.subcategory.name }}</td>
+                            <td class="px-4 py-3 font-medium">{{ item.sku|default:"-" }}</td>
+                            <td class="px-4 py-3 font-bold text-emerald-700 whitespace-nowrap">Rs. {{ item.price }}</td>
+                            <td class="px-4 py-3">
+                                {% if item.stock_quantity > 10 %}
+                                    <span class="inline-flex items-center whitespace-nowrap rounded-full bg-emerald-100 text-emerald-700 px-2.5 py-1 text-xs font-semibold">{{ item.stock_quantity }} In Stock</span>
+                                {% elif item.stock_quantity > 0 %}
+                                    <span class="inline-flex items-center whitespace-nowrap rounded-full bg-amber-100 text-amber-700 px-2.5 py-1 text-xs font-semibold">{{ item.stock_quantity }} Low Stock</span>
+                                {% else %}
+                                    <span class="inline-flex items-center whitespace-nowrap rounded-full bg-rose-100 text-rose-700 px-2.5 py-1 text-xs font-semibold">Out of Stock</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center gap-3">
+                                    <a class="text-cyan-700 hover:text-cyan-900 font-medium transition" href="{% url 'item-edit' item.pk %}">Edit</a>
+                                    <a class="text-rose-700 hover:text-rose-900 font-medium transition" href="{% url 'item-delete' item.pk %}">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-4 py-10 text-center text-slate-500">No items found.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
